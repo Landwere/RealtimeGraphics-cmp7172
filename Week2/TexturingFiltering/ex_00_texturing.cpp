@@ -105,6 +105,17 @@ int main()
 		// 2. If you get weird colours, remember OpenCV images come in BGR format by default. 
 		//    You might need to swap it to RGB before providing it to OpenGL (use cv::cvtColor()).
 
+		
+		cv::Mat textureCV;
+		textureCV = cv::imread("../models/spot/spot_texture.png");
+		GLuint texture[1];
+
+
+
+		glGenTextures(0, &texture[1]);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_BGR, textureCV.cols, textureCV.rows, 0, GL_RGB, GL_UNSIGNED_BYTE, textureCV.data);
+		
+
 		bool shouldQuit = false;
 		SDL_Event event;
 
@@ -142,6 +153,9 @@ int main()
 			// --- Your code here ---
 			// Before rendering the Spot mesh, bind the texture you created to the
 			// correct image unit (probably 0, so GL_TEXTURE0)
+			glBindTexture(GL_TEXTURE_2D, *texture);
+
+			
 
 			SDL_GL_SwapWindow(window);
 
@@ -153,6 +167,8 @@ int main()
 
 		// --- Your code here ---
 		// Make sure to delete the texture you created here.
+
+		
 	}
 
 

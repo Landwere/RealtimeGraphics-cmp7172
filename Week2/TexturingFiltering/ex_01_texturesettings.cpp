@@ -131,25 +131,40 @@ int main()
 				if (event.type == SDL_KEYDOWN) {
 					if (event.key.keysym.sym == SDLK_1) {
 						gltSetText(text, "Nearest-neighbour");
-						// Perform nearest-neighbour filtering here.
+						// Perform nearest-neighbour filtering here.#
+						glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+						glTextureParameteri(texture, GL_TEXTURE_MAX_ANISOTROPY, 1);
+
 					}
 					else if (event.key.keysym.sym == SDLK_2) {
 						gltSetText(text, "Linear, no MIP map");
 						// Perform linear filtering here (don't use MIP map).
+						glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER , GL_LINEAR);
+						glTextureParameteri(texture, GL_TEXTURE_MAX_ANISOTROPY, 1);
+
 					}
 					else if (event.key.keysym.sym == SDLK_3) {
 						gltSetText(text, "Linear, MIP map levels nearest-neighbour");
 						// Perform linear filtering here and use the MIP map filtering between levels
 						// with a nearest-neighbour filter.
+						glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_NEAREST);
+						glTextureParameteri(texture, GL_TEXTURE_MAX_ANISOTROPY, 1);
+
 					}
 					else if (event.key.keysym.sym == SDLK_4) {
 						gltSetText(text, "Linear, MIP map levels linear");
 						// Perform linear filtering here and use the MIP map filtering between levels
 						// with a linear filter.
+						glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER , GL_LINEAR_MIPMAP_LINEAR);
+						glTextureParameteri(texture, GL_TEXTURE_MAX_ANISOTROPY, 1);
+
 					}
 					else if (event.key.keysym.sym == SDLK_5) {
 						// Perform linear filtering here and use the MIP map filtering between levels
 						// with a linear filter. Also apply up to 4-sample anisotropic filtering.
+						glTextureParameteri(texture, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+						glTextureParameteri(texture, GL_TEXTURE_MAX_ANISOTROPY, 4);
+
 					}
 				}
 				if (event.type == SDL_QUIT) {

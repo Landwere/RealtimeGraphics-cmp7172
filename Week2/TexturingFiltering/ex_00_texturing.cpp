@@ -93,6 +93,7 @@ int main()
         loadSpotMesh(&spotMesh);
 		spotMesh.shaderProgram(&texturedMeshShader);
 
+		glProgramUniform1i(texturedMeshShader.get(), texturedMeshShader.uniformLoc("tex"), 0);
 		// --- Your code here ---
 		// Here you should load the texture image from ../models/spot/spot_texture.png using OpenCV
 		// Create an OpenGL texture from this image (use glGenTextures, glTexImage2D etc.)
@@ -108,13 +109,16 @@ int main()
 		
 		cv::Mat textureCV;
 		textureCV = cv::imread("../models/spot/spot_texture.png");
-		GLuint texture[1];
+		GLuint texture;
 
+		//cv::imshow("cow", textureCV);
+		//cv::waitKey();
 
-
-		glGenTextures(0, &texture[1]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_BGR, textureCV.cols, textureCV.rows, 0, GL_RGB, GL_UNSIGNED_BYTE, textureCV.data);
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, textureCV.cols, textureCV.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, textureCV.data);
 		
+		glGenerateTextureMipmap(texture);
 
 		bool shouldQuit = false;
 		SDL_Event event;
@@ -153,9 +157,10 @@ int main()
 			// --- Your code here ---
 			// Before rendering the Spot mesh, bind the texture you created to the
 			// correct image unit (probably 0, so GL_TEXTURE0)
-			glBindTexture(GL_TEXTURE_2D, *texture);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture);
 
-			
+			spotMesh.render();
 
 			SDL_GL_SwapWindow(window);
 
@@ -167,6 +172,8 @@ int main()
 
 		// --- Your code here ---
 		// Make sure to delete the texture you created here.
+
+
 
 		
 	}

@@ -25,12 +25,14 @@ void main()
 	vec3 viewDir = normalize(cameraPos.xyz - fragPosWorld);
 	float lightDistance = length(lightPosWorld - fragPosWorld);
 	vec4 albedo = texture(albedoTex, texCoord);
+	vec4 normal = texture(normalTex, texCoord);
 
 	// --- Your Code Here
 	// Note that we're just using the mesh normal here (transformed to world space)
 	// Change this to sample your normal map texture, and use it to adjust the normal.
 	// Remember to rescale the normal from [0,1] to [-1,1]
 
+	vec4 normalColor = vec4(normal.xyz * 2) - 1;
 	vec4 diffuseColor = vec4(albedo.xyz * dot(normWorld, lightDir), 1.0f);
 	float specularPower = pow(clamp(dot(reflect(lightDir, normWorld), -viewDir), 0, 1), specularity);
 	vec4 specularColor = vec4(specularPower * vec3(1,1,1), 1.0);

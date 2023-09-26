@@ -62,6 +62,10 @@ void loadSpotMesh(glhelper::Mesh* mesh)
 	std::vector<Eigen::Vector3f> verts(aimesh->mNumVertices);
 	std::vector<Eigen::Vector3f> norms(aimesh->mNumVertices);
 	std::vector<Eigen::Vector2f> uvs(aimesh->mNumVertices);
+	std::vector<Eigen::Vector3f> tangents(aimesh->mNumVertices);
+	std::vector<Eigen::Vector3f> biTangents(aimesh->mNumVertices);
+
+
 	std::vector<GLuint> elems(aimesh->mNumFaces*3);
 	memcpy(verts.data(), aimesh->mVertices, aimesh->mNumVertices * sizeof(aiVector3D));
 	memcpy(norms.data(), aimesh->mNormals, aimesh->mNumVertices * sizeof(aiVector3D));
@@ -74,6 +78,9 @@ void loadSpotMesh(glhelper::Mesh* mesh)
 			elems[f * 3 + i] = aimesh->mFaces[f].mIndices[i];
 		}
 	}
+
+	mesh->tangent(tangents);
+	mesh->bitangent(biTangents);
 
 	mesh->vert(verts);
 	mesh->norm(norms);
@@ -171,7 +178,10 @@ int main()
 		// (set the shader's sampler uniform to a suitable index, and bind the
 		// texture to the same image unit).
 		glProgramUniform1i(normalMapShader.get(), normalMapShader.uniformLoc("albedoTex"), 0);
+
 		glProgramUniform4f(fixedColorShader.get(), fixedColorShader.uniformLoc("color"), 1.f, 1.f, 1.f, 1.f);
+
+		glProgramUniform1i(normalMapShader.get(), normalMapShader.uniformLoc("normalTex"), 1);
 
 		GLuint albedoTexture;
 
@@ -179,6 +189,13 @@ int main()
 			cv::Mat image = cv::imread("../models/spot/spot_texture.png");
 			cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
 			albedoTexture = createTexture(image);
+		}
+
+		GLuint normalMap;
+		{
+			cv::Mat image = cv::imread("../images/normalmap.png");
+			cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+			normalMap = createTexture(image);
 		}
 
 		bool shouldQuit = false;
@@ -220,6 +237,8 @@ int main()
 			// --- Your code here ---
 			// We've only bound the albedo texture so far - bind the 
 			// normal texture too!
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_2D, normalMap);
 
 			spotMesh.render();
 			sphereMesh.render();
@@ -235,6 +254,7 @@ int main()
 		glDeleteTextures(1, &albedoTexture);
 		// --- Your code here ---
 		// Remember to delete your normal texture once you're done with it too!
+		glDeleteTextures(1, &normalMap);
 	}
 
 

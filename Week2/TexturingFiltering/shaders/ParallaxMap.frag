@@ -29,6 +29,13 @@ void main()
 		// --- Your code here ---
 		// Implement parallax mapping
 		// Find the offset texture coordinate and save it to offsetTexCoord.
+		
+		//transpose camera dir to tangent space
+
+		vec2 camAngle = normalize((cameraDir.xy * 2) - 1);
+
+		offsetTexCoord = texCoord + (((depthScale * texCoord ) * (camAngle)) / cameraDir.z);
+		
 
 	} else if(parallaxMode == 1) {
 		// --- Your code here ---

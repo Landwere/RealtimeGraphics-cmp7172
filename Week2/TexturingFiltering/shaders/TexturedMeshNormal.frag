@@ -32,7 +32,8 @@ void main()
 	// Change this to sample your normal map texture, and use it to adjust the normal.
 	// Remember to rescale the normal from [0,1] to [-1,1]
 
-	vec4 normalColor = vec4(normal.xyz * 2) - 1;
+	//vec4 normalColor = vec4((normal.xyz * 2) - 1);
+	vec3 normWorld = vec3((normal.xyz * 2 ) -1);
 	vec4 diffuseColor = vec4(albedo.xyz * dot(normWorld, lightDir), 1.0f);
 	float specularPower = pow(clamp(dot(reflect(lightDir, normWorld), -viewDir), 0, 1), specularity);
 	vec4 specularColor = vec4(specularPower * vec3(1,1,1), 1.0);

@@ -32,6 +32,11 @@ void main()
 	if(lightingMode == 0) {
 		// Render with original Phong lighting model
 		// --- Your Code Here ---
+		vec3 diffuse = albedo.rgb  *  clamp( dot( lightDir, worldNorm), 0, 1);
+		float spec = (pow( clamp( dot(-reflect(lightDir, worldNorm), viewDir), 0, 1), specularExponent) * specularIntensity);
+		
+		colorOut.rgb = (diffuse + spec) * lightIntensity / (lightDistance * lightDistance);
+		
 	} else if(lightingMode == 1) {
 		// Render with Blinn-Phong
 		// --- Your Code Here ---

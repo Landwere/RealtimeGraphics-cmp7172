@@ -40,12 +40,29 @@ void main()
 	} else if(lightingMode == 1) {
 		// Render with Blinn-Phong
 		// --- Your Code Here ---
+		
+		float specHighExponent = specularExponent * 2;
+		vec3 diffuse = albedo.rgb  *  clamp( dot( lightDir, worldNorm), 0, 1);
+		float spec = (pow( clamp( dot(normalize(lightDir + viewDir), worldNorm), 0, 1), specHighExponent) * specularIntensity);
+		
+		colorOut.rgb = (diffuse + spec) * lightIntensity / (lightDistance * lightDistance);
 	} else if(lightingMode == 2) {
 		// Render with Modified Blinn-Phong
 		// --- Your Code Here ---
+		float specHighExponent = specularExponent * 2;
+		vec3 diffuse = albedo.rgb;
+		float spec = (pow( clamp( dot(normalize(lightDir + viewDir), worldNorm), 0, 1), specHighExponent) * specularIntensity);
+		
+		colorOut.rgb = ((diffuse + spec) * lightIntensity / (lightDistance * lightDistance)) * clamp( dot(lightDir, worldNorm), 0, 1);
 	} else if(lightingMode == 3) {
 		// Render with Modified Blinn-Phong, Normalized
 		// --- Your Code Here ---
+		float specHighExponent = specularExponent * 2;
+		vec3 diffuse = albedo.rgb;
+		float specNorm = (specularIntensity + 8) / 8;
+		float spec = ((pow( clamp( dot(normalize(lightDir + viewDir), worldNorm), 0, 1), specHighExponent ) * specNorm) * specularIntensity);
+		
+		colorOut.rgb = ((diffuse + spec) * lightIntensity / (lightDistance * lightDistance)) * clamp( dot(lightDir, worldNorm), 0, 1);
 	}
 }
 

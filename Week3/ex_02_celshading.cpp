@@ -120,6 +120,8 @@ int main()
 	{
 		glhelper::ShaderProgram celShadingShader({ "../shaders/CelShading.vert", "../shaders/CelShading.frag" });
 		glhelper::ShaderProgram fixedColorShader({ "../shaders/FixedColor.vert", "../shaders/FixedColor.frag" });
+		glhelper::ShaderProgram backFaceShader({ "../shaders/BackfaceShellExpansion.vert", "../shaders/BackfaceShellExpansion.frag" });
+
 		glhelper::RotateViewer viewer(winWidth, winHeight);
 		//glhelper::FlyViewer viewer(winWidth, winHeight);
 		glhelper::Mesh spotMesh, sphereMesh;
@@ -127,7 +129,9 @@ int main()
         loadMesh(&spotMesh, "../models/spot/spot_triangulated.obj");
         loadMesh(&sphereMesh, "../models/sphere.obj");
 		spotMesh.shaderProgram(&celShadingShader);
+		spotMesh.shaderProgram(&backFaceShader);
 		sphereMesh.shaderProgram(&fixedColorShader);
+
 		sphereMesh.modelToWorld(makeTranslationMatrix(lightPos));
 
 		glProgramUniform1i(celShadingShader.get(), celShadingShader.uniformLoc("albedoTexture"), 0);
@@ -135,6 +139,8 @@ int main()
 		glProgramUniform3f(celShadingShader.get(), celShadingShader.uniformLoc("lightPosWorld"), lightPos.x(), lightPos.y(), lightPos.z());
 		glProgramUniform4f(fixedColorShader.get(), fixedColorShader.uniformLoc("color"), 1.f, 1.f, 1.f, 1.f);
 
+		glProgramUniform1f(backFaceShader.get(), backFaceShader.uniformLoc("expansionAmt"), 0.01f);
+		glProgramUniform4f(backFaceShader.get(), backFaceShader.uniformLoc("color"), 0, 0, 0, 1);
 		cv::Mat spotTextureImage = cv::imread("../models/spot/spot_texture.png");
 		cv::cvtColor(spotTextureImage, spotTextureImage, cv::COLOR_BGR2RGB);
 		GLuint spotTexture;
@@ -153,6 +159,18 @@ int main()
 		// Load it as a 1D texture (use GL_TEXTURE_1D)
 		// Some of the settings will need to be adjusted from using 2D textures
 		// like you did in the last lab - do check the specs!
+		GLuint celTexture;
+		{
+			cv::Mat image = cv::imread("../images/cel_texture_2level.png");
+			cv::cvtColor(image, image, cv::COLOR_BGR2RGB);
+
+			glGenTextures(1, &celTexture);
+			glBindTexture(GL_TEXTURE_1D, celTexture);
+			glTexImage1D(GL_TEXTURE_1D, 0, GL_R8, image.cols, 0, GL_RGB, GL_UNSIGNED_BYTE, image.data);
+			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		}
+
 
 		bool shouldQuit = false;
 		SDL_Event event;
@@ -180,7 +198,7 @@ int main()
 					}
 				}
 			}
-			glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+			glClearColor(0.0f, 0.0f, 0.9f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			if (lightRotating) {
@@ -196,6 +214,9 @@ int main()
 			glBindTexture(GL_TEXTURE_2D, spotTexture);
 			// -- Your Code Here --
 			// Bind your new 1D lighting texture to image unit 1.
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_1D, celTexture);
+			spotMesh.shaderProgram(&celShadingShader);
 
 			spotMesh.render();
 			sphereMesh.render();
@@ -205,6 +226,14 @@ int main()
 			// expansion to make some nice black outlines.
 			// Remember to change the culling settings to cull frontfaces rather 
 			// than backfaces, and change them back afterwards!
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_FRONT);
+			spotMesh.shaderProgram(&backFaceShader);
+
+			spotMesh.render();
+		
+			glDisable(GL_CULL_FACE);
+
 
 			gltBeginDraw();
 			gltColor(1.f, 1.f, 1.f, 1.f);
@@ -219,6 +248,7 @@ int main()
 			}
 		}
 		glDeleteTextures(1, &spotTexture);
+		glDeleteTextures(1, &celTexture);
 	}
 
 	gltDeleteText(text);

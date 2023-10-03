@@ -22,10 +22,13 @@ void main()
 {
 	vec3 albedo = texture(albedoTexture, texCoord).xyz;
 
+	float lightingCoord = dot(normalize(lightPosWorld - fragPosWorld), worldNorm);
+	float lightTex = texture(lightingTexture, lightingCoord).x;
 	// -- Your code here ---
 	// Modulate the lighting using the 1D texture you loaded.
+	colorOut.xyz = albedo * lightTex;
 
-	colorOut.xyz = albedo;
+	//colorOut.xyz = albedo;
 	colorOut.a = 1.0;
 }
 

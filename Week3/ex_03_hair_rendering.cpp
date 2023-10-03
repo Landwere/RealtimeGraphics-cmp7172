@@ -73,14 +73,23 @@ void loadMesh(glhelper::Mesh* mesh, const std::string &filename, int idx = 0)
 	// Modify the line below to load the tangent information you need. 
 	// Also add the relevant tangents to the mesh (remember it's the 
 	// bitangents you're after!)
-	importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+
+
+	importer.ReadFile(filename, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 	const aiScene* aiscene = importer.GetScene();
 	const aiMesh* aimesh = aiscene->mMeshes[idx];
+
+	std::vector<Eigen::Vector3f> biTan(aimesh->mNumVertices);
+
 
 	std::vector<Eigen::Vector3f> verts(aimesh->mNumVertices);
 	std::vector<Eigen::Vector3f> norms(aimesh->mNumVertices);
 	std::vector<Eigen::Vector2f> uvs(aimesh->mNumVertices);
 	std::vector<GLuint> elems(aimesh->mNumFaces*3);
+
+	memcpy(biTan.data(), aimesh->mBitangents, aimesh->mNumVertices * sizeof(aiVector3D));
+
+
 	memcpy(verts.data(), aimesh->mVertices, aimesh->mNumVertices * sizeof(aiVector3D));
 	memcpy(norms.data(), aimesh->mNormals, aimesh->mNumVertices * sizeof(aiVector3D));
 	for (size_t v = 0; v < aimesh->mNumVertices; ++v) {
@@ -92,7 +101,7 @@ void loadMesh(glhelper::Mesh* mesh, const std::string &filename, int idx = 0)
 			elems[f * 3 + i] = aimesh->mFaces[f].mIndices[i];
 		}
 	}
-
+	mesh->bitangent(biTan);
 	mesh->vert(verts);
 	mesh->norm(norms);
 	mesh->elems(elems);

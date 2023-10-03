@@ -4,7 +4,7 @@
 layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec3 vNorm;
 layout(location = 2) in vec2 vTex;
-layout(location = 4) in vec3 vTangent;
+layout(location = 5) in vec3 vBiTangent;
 
 layout(std140) uniform cameraBlock
 {
@@ -29,5 +29,7 @@ void main()
 
 	// --- Your Code Here ---
 	// Also pass the tangent along the hair strands to the fragment shader.
+
+	worldTangent = normToWorld * vBiTangent;
 }
 

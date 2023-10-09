@@ -39,6 +39,8 @@ float theta = 0.0f;
 bool lightRotating = false;
 Eigen::Vector3f lightPos(5.f*sinf(theta), 5.f, 5.f*cosf(theta));
 
+float lightIntensity = 60.0f;
+
 void loadMesh(glhelper::Mesh* mesh, const std::string &filename) 
 {
 	Assimp::Importer importer;
@@ -119,6 +121,8 @@ int main()
 
 		glProgramUniform1i(wrapLightingShader.get(), wrapLightingShader.uniformLoc("albedoTexture"), 0);
 		glProgramUniform4f(fixedColorShader.get(), fixedColorShader.uniformLoc("color"), 1.f, 1.f, 1.f, 1.f);
+		glProgramUniform1f(wrapLightingShader.get(), wrapLightingShader.uniformLoc("lightIntensity"), lightIntensity);
+		glProgramUniform3f(wrapLightingShader.get(), wrapLightingShader.uniformLoc("lightPosWorld"), lightPos.x(), lightPos.y(), lightPos.z());
 
 		cv::Mat bunnyTextureImage = cv::imread("../models/stanford_bunny/textures/Bunny_baseColor.png");
 		cv::cvtColor(bunnyTextureImage, bunnyTextureImage, cv::COLOR_BGR2RGB);
@@ -168,6 +172,7 @@ int main()
 				if (theta > 2 * 3.14159f) theta = 0.f;
 				lightPos << 5.f * sinf(theta), 5.f, 5.f * cosf(theta);
 				sphereMesh.modelToWorld(makeTranslationMatrix(lightPos));
+				glProgramUniform3f(wrapLightingShader.get(), wrapLightingShader.uniformLoc("lightPosWorld"), lightPos.x(), lightPos.y(), lightPos.z());
 			}
 
 			glDisable(GL_CULL_FACE);

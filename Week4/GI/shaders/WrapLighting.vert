@@ -18,6 +18,7 @@ out vec3 worldNorm;
 out vec3 worldPos;
 out vec2 texCoord;
 
+
 void main()
 {
 	gl_Position = worldToClip *  modelToWorld * vec4(vPos, 1.0);

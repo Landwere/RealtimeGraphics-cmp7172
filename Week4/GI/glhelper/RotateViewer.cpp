@@ -18,7 +18,7 @@ const float moveSpeed = 0.1f;
 RotateViewer::RotateViewer(int width, int height)
 :theta_(0.f), phi_(0.f),
 thetaSpeed_(0.01f), phiSpeed_(0.01f),
-delta_(-10.f), deltaSpeed_(0.1f)
+delta_(-10.f), deltaSpeed_(1.0f)
 {
 	perspective_ = perspective(fov, float(width)/float(height), zNear, zFar);
 	updateTranslation();

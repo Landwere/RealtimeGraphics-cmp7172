@@ -17,7 +17,7 @@ out vec4 colorOut;
 uniform vec4 color;
 uniform vec3 lightPosWorld;
 uniform float lightIntensity;
-
+uniform float wrapAmount;
 
 
 void main()
@@ -30,8 +30,9 @@ void main()
 	colorOut.xyz = albedo;
 	colorOut.a = 1.0;
 	// Add your illumination code here!
+		
 
-		vec3 diffuse = albedo.rgb  *  clamp( dot( lightDir, worldNorm), 0, 1);
+		vec3 diffuse = albedo.rgb  *  clamp( (dot( lightDir, worldNorm) + wrapAmount) / 1 + wrapAmount, 0, 1);
 		
 		colorOut.rgb = (diffuse);
 

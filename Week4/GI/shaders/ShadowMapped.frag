@@ -23,6 +23,15 @@ void main()
 	vec3 lightDir = normalize(lightPosWorld - fragPosWorld);
 	float lightDot = clamp(dot(lightDir, normalize(worldNorm)), 0, 1);
 	vec3 colorRgb = color.rgb * lightDot;
+	
+	float realDist = distance(lightPosWorld, fragPosWorld);
+	float lightDist = texture(shadowMap, -lightDir).r * (farPlane - nearPlane) + nearPlane;
+
+	if( realDist > lightDist)
+	{
+		colorRgb *= 0.1f;
+	}
+	// if real distance > light distance add shadow
 
 	colorOut.rgb = colorRgb;
 	colorOut.a = 1.0;

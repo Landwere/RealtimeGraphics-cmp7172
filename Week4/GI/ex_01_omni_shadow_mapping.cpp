@@ -82,6 +82,9 @@ float shadowMapBias = 1.0f;
 float lightWidth = 0.01f;
 int sampleRadius = 1;
 
+const float shadowNear = 0.1f;
+const float shadowFar = 100.0f;
+
 void loadMesh(glhelper::Mesh* mesh, const std::string &filename) 
 {
 	Assimp::Importer importer;
@@ -211,11 +214,20 @@ int main()
 		// Create your cubemap texture here, and a framebuffer object to
 		// allow you to render to it.
 		// You'll need to call glTexImage2D 6 times this time, once per face.
+		GLuint cubeMapTexture;
+		glGenTextures(1, &cubeMapTexture);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+		for (int i = 0; i < 6; ++i)
+		{
+			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, cubemapSize, cubemapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+		}
 
 		// Your Code Here
 		// Set this matrix to be an appropriate projection matrix for rendering your cubemaps.
 		// Feel free to use the functions in glhelper's Matrices.hpp.
 		Eigen::Matrix4f cubemapPerspective;
+
+		cubemapPerspective = perspective(M_PI_2, 1, shadowNear, shadowFar);
 
 		// Here are the rotations for each face of the cubemap (please do use them!)
 		const std::array<Eigen::Matrix4f, 6> cubemapRotations {
@@ -233,6 +245,9 @@ int main()
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		GLuint frameBuffer;
+		glGenFramebuffers(1, &frameBuffer);
 
 		while (!shouldQuit) {
 			Uint64 frameStartTime = SDL_GetTicks64();
@@ -313,12 +328,42 @@ int main()
 			// Before rendering the main scene don't forget to unbind your framebuffer and set
 			// the viewport back to normal.
 
-			bunnyTexture.bindToImageUnit(0);
+			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+
+
 			// Your Code Here
 			// Also bind your created shadow cubemap texture here, to image unit 1.
-			for (glhelper::Renderable* mesh : scene) {
-				mesh->render();
+			glViewport(0, 0, cubemapSize, cubemapSize);
+
+			for (int i = 0; i < 6; ++i) {
+
+				glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, cubeMapTexture, 0);
+				glClear(GL_DEPTH_BUFFER_BIT);
+
+				Eigen::Matrix4f clipMatrix;
+				clipMatrix = lightPos * cubeMapTexture * cubemapPerspective;
+				glProgramUniformMatrix4fv(shadowMapShader.get(), shadowMapShader.uniformLoc("shadowWorldToClip"), 1, false, clipMatrix);
+					for (glhelper::Renderable* mesh : scene) 
+					{
+						if (mesh->castsShadow())
+							mesh->render(shadowMapShader);
+
+					}
 			}
+
+
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			glViewport(0, 0, winWidth, winHeight);
+
+			bunnyTexture.bindToImageUnit(0);
+			glActiveTexture(GL_TEXTURE0 + 1);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubeMapTexture);
+			for (glhelper::Renderable* mesh : scene) {
+					mesh->render();
+
+			}
+
+
 
 			gltBeginDraw();
 			gltColor(1.f, 1.f, 1.f, 1.f);
@@ -334,6 +379,8 @@ int main()
 		}
 		// Your Code Here
 		// Don't forget to delete your cubemap texture.
+		glDeleteFramebuffers(1, &frameBuffer);
+		glDeleteTextures(1, &cubeMapTexture);
 	}
 
 

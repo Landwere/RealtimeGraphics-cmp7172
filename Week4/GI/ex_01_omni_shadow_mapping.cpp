@@ -342,7 +342,7 @@ int main()
 
 				Eigen::Matrix4f clipMatrix;
 				clipMatrix = lightPos * cubeMapTexture * cubemapPerspective;
-				glProgramUniformMatrix4fv(shadowMapShader.get(), shadowMapShader.uniformLoc("shadowWorldToClip"), 1, false, clipMatrix);
+				glProgramUniformMatrix4fv(shadowMapShader.get(), shadowMapShader.uniformLoc("shadowWorldToClip"), 1, false, clipMatrix.data());
 					for (glhelper::Renderable* mesh : scene) 
 					{
 						if (mesh->castsShadow())

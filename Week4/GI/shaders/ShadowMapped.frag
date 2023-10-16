@@ -27,7 +27,7 @@ void main()
 	float realDist = distance(lightPosWorld, fragPosWorld);
 	float lightDist = texture(shadowMap, -lightDir).r * (farPlane - nearPlane) + nearPlane;
 
-	if( realDist > lightDist)
+	if( realDist > lightDist + 1.0f )
 	{
 		colorRgb *= 0.1f;
 	}

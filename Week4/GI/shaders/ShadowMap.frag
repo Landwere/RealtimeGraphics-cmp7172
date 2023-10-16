@@ -16,7 +16,7 @@ void main()
 	// You'll probably want to scale your depths to be in the [0,1] range
 	// based on the current nearPlane & farPlane values.
 	
-	float lightLength = length(fragPosWorld - fragPosWorld);
+	float lightLength = length(fragPosWorld - lightPosWorld);
 	gl_FragDepth = clamp( (lightLength - nearPlane) / (farPlane - nearPlane) ,0, 1);
 }
 

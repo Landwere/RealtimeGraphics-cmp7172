@@ -77,7 +77,7 @@ float theta = 0.0f, phi = 0.0f;
 const float lightRadius = 5.f;
 bool lightRotating = false;
 Eigen::Vector3f lightPos(lightRadius * sinf(theta) * cosf(phi), lightRadius * sinf(phi),  lightRadius * cosf(theta) * cosf(phi));
-const float shadowMapNear = 0.5f, shadowMapFar = 100.f;
+const float shadowMapNear = 0.1f, shadowMapFar = 100.f;
 float shadowMapBias = 1.0f;
 float lightWidth = 0.01f;
 int sampleRadius = 1;
@@ -184,7 +184,10 @@ int main()
 		sphereMesh.shaderProgram(&fixedColorShader);
 		sphereMesh.setCastsShadow(false); // The light source sphere shouldn't cast a shadow, 
 		// as otherwise everything would always be in shadow!
+
 		roomMesh.shaderProgram(&shadowMappedShader);
+		//roomMesh.setCastsShadow(false);
+
 		sphereMesh.modelToWorld(makeTranslationMatrix(lightPos) * makeScaleMatrix(lightWidth));
 
 		glProgramUniform1i(bunnyShader.get(), bunnyShader.uniformLoc("albedoTexture"), 0);
@@ -248,6 +251,12 @@ int main()
 
 		GLuint frameBuffer;
 		glGenFramebuffers(1, &frameBuffer);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+		glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeMapTexture, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
 
 		while (!shouldQuit) {
 			Uint64 frameStartTime = SDL_GetTicks64();
@@ -328,8 +337,17 @@ int main()
 			// Before rendering the main scene don't forget to unbind your framebuffer and set
 			// the viewport back to normal.
 
+			Eigen::Matrix4f flipMatrix;
+			flipMatrix <<
+				-1.0f, 0.0f, 0.0f, 0.0f,
+				0.0f, -1.0f, 0.0f, 0.0f,
+				0, 0, 1, 0,
+				0, 0, 0, 1;
+
+
 			glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
+			glDisable(GL_CULL_FACE);
 
 			// Your Code Here
 			// Also bind your created shadow cubemap texture here, to image unit 1.
@@ -341,16 +359,21 @@ int main()
 				glClear(GL_DEPTH_BUFFER_BIT);
 
 				Eigen::Matrix4f clipMatrix;
-				clipMatrix = lightPos * cubeMapTexture * cubemapPerspective;
+
+				clipMatrix = flipMatrix * cubemapPerspective * cubemapRotations[i] * makeTranslationMatrix(-lightPos);
+				
+
 				glProgramUniformMatrix4fv(shadowMapShader.get(), shadowMapShader.uniformLoc("shadowWorldToClip"), 1, false, clipMatrix.data());
+
 					for (glhelper::Renderable* mesh : scene) 
 					{
 						if (mesh->castsShadow())
 							mesh->render(shadowMapShader);
 
 					}
-			}
 
+			}
+			glGenerateTextureMipmap(cubeMapTexture);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glViewport(0, 0, winWidth, winHeight);
@@ -363,7 +386,7 @@ int main()
 
 			}
 
-
+			glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 
 			gltBeginDraw();
 			gltColor(1.f, 1.f, 1.f, 1.f);

@@ -113,7 +113,7 @@ int main()
 				dispatcher.get(), overlappingPairCache.get(), solver.get(), collisionConfig.get());
 
 		// You may want to set appropriate gravity here.
-
+		world->setGravity(btVector3(0, -1, 0));
 		// When you create your shapes (box and sphere) add them to this array. 
 		// You should then delete them at the end of the program.
 		btAlignedObjectArray<btCollisionShape*> collisionShapes;
@@ -121,6 +121,14 @@ int main()
 			// Make a rigidbody for the floor
 			// Make a box collision shape, set its transform, mass, inertia and restitution
 			// then make the rigidbody with these properties and add it to the world.
+			btBoxShape* box;
+			box = new btBoxShape(btVector3(5, 1, 5));
+			btRigidBody* floor;
+			btRigidBody::btRigidBodyConstructionInfo floorInfo{ 0, 0, box};
+			floor = new btRigidBody(floorInfo);
+			floor->setCollisionShape(box);
+			floor->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, groundYPos, 0.0f)));
+			world->addCollisionObject(floor);
 		}
 
 		{

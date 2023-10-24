@@ -158,6 +158,8 @@ int main()
 	gltSetText(text, (std::string("wrapAmount: ") + std::to_string(wrapAmount)).c_str());
 	glEnable(GL_MULTISAMPLE);
 
+	glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
 	{
 		glhelper::ShaderProgram bunnyShader({ "../shaders/LambertianTextured.vert", "../shaders/LambertianTextured.frag" });
 		glhelper::ShaderProgram fixedColorShader({ "../shaders/FixedColor.vert", "../shaders/FixedColor.frag" });
@@ -224,7 +226,7 @@ int main()
 		{
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, cubemapSize, cubemapSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 		}
-
+		glTextureParameteri(cubeMapTexture, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		// Your Code Here
 		// Set this matrix to be an appropriate projection matrix for rendering your cubemaps.
 		// Feel free to use the functions in glhelper's Matrices.hpp.
@@ -373,7 +375,7 @@ int main()
 					}
 
 			}
-			glGenerateTextureMipmap(cubeMapTexture);
+			//glGenerateTextureMipmap(cubeMapTexture);
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			glViewport(0, 0, winWidth, winHeight);

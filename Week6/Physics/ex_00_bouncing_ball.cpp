@@ -130,6 +130,7 @@ int main()
 			floor->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, groundYPos, 0.0f)));
 			world->addCollisionObject(floor);
 		}
+		btRigidBody* ball;
 
 		{
 			// Make a rigidbody for the ball
@@ -139,7 +140,19 @@ int main()
 			// By default, the sphere will be dectivated if it stops moving and you'll need to call
 			// body->activate(); again for impulses and forces to have any effect.
 			// This is more efficient, but annoying for debugging!
+			btSphereShape* sphere;
+			sphere = new btSphereShape(btScalar(1));
+			btTransform ballTr;
+			ballTr.setOrigin(btVector3(0.0f, 5.f, 0));
+			btDefaultMotionState* ballMS = new btDefaultMotionState(ballTr);
+
+			btRigidBody::btRigidBodyConstructionInfo ballInfo{ 1, ballMS, sphere };
+			ball = new btRigidBody(ballInfo);
+			ball->setCollisionShape(sphere);
+			ball->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, 5.0f, 0.0f)));
+			ball->setActivationState(DISABLE_DEACTIVATION);
 		}
+		
 
 		glhelper::ShaderProgram lambertianShader({ "../shaders/FixedColorLambertian.vert", "../shaders/FixedColorLambertian.frag" });
 		glhelper::RotateViewer viewer(winWidth, winHeight);
@@ -177,12 +190,16 @@ int main()
 			// runs slower than 60FPS (which it will, it's set to 30FPS!) then Bullet can
 			// perform up to 10 simulation steps using its fixed update rate of 60Hz.
 			// This makes it much more stable!
+			world->stepSimulation((desiredFrametime / 1000.0f), 10);
 
 			// Now get the transform of your sphere collisionObject and use it to
 			// update your OpenGL sphere's modelToWorld property.
 			// You can keep a reference to the sphere when you create it, or 
 			// get it from the  world using world->getCollisionObjectArray() and selecting its
 			// index (it'll be 1 if you added it second).
+			btVector3 ballPos =  ball->getWorldTransform().getOrigin();
+			std::cout << "ball pos: " << ballPos.y() << std::endl;
+			ballMesh.modelToWorld(makeTranslationMatrix(Eigen::Vector3f(ballPos.x(), ballPos.y(), ballPos.z())));
 
 			viewer.update();
 

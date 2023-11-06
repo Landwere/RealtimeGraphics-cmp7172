@@ -119,6 +119,16 @@ void loadMesh(glhelper::Mesh* mesh, const std::string &filename, std::vector<Bon
 	// I suggest setting boneIndices to -1 initially - this can be your default index
 	// used when less than 4 bones affect a vertex.
 
+	for (size_t i = 0; i < aimesh->mNumBones; ++i)
+	{
+		for (size_t j = 0; j < 4; ++j)
+		{
+			boneIndices[i][j] = -1;
+			boneIndices[i][j] = aimesh->mBones[i];
+		}
+
+	}
+
 	mesh->vert(verts);
 	mesh->norm(norms);
 	mesh->elems(elems);

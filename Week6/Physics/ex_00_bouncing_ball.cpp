@@ -144,6 +144,7 @@ int main()
 			sphere = new btSphereShape(btScalar(1));
 			btTransform ballTr;
 			ballTr.setOrigin(btVector3(0.0f, 5.f, 0));
+			//sphere->calculateLocalInertia(1, btVector3(0, 0, 0));
 			btDefaultMotionState* ballMS = new btDefaultMotionState(ballTr);
 
 			btRigidBody::btRigidBodyConstructionInfo ballInfo{ 1, ballMS, sphere };
@@ -151,6 +152,7 @@ int main()
 			ball->setCollisionShape(sphere);
 			ball->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, 5.0f, 0.0f)));
 			ball->setActivationState(DISABLE_DEACTIVATION);
+			world->addRigidBody(ball);
 		}
 		
 
@@ -197,7 +199,9 @@ int main()
 			// You can keep a reference to the sphere when you create it, or 
 			// get it from the  world using world->getCollisionObjectArray() and selecting its
 			// index (it'll be 1 if you added it second).
-			btVector3 ballPos =  ball->getWorldTransform().getOrigin();
+			btTransform ballTran;
+			ball->getMotionState()->getWorldTransform(ballTran);
+			btVector3 ballPos = ballTran.getOrigin();
 			std::cout << "ball pos: " << ballPos.y() << std::endl;
 			ballMesh.modelToWorld(makeTranslationMatrix(Eigen::Vector3f(ballPos.x(), ballPos.y(), ballPos.z())));
 

@@ -25,7 +25,13 @@ void main()
 	// Finally add a radial falloff to your alpha to get rid of those boxy edges (think about how to do this,
 	// construct a function that falls off based on the distance from the centre of the quad, which is at 
 	// texture coordinate (0.5, 0.5)).
+	//fragColor = texture(flameColorTex, texCoords);
+	float flameAlpha = texture(flameAlphaTex, vec2((texCoords.x  * texWindowSize) + texXOffset, (texCoords.y * texWindowSize) + flameTime)).r;
 
-	fragColor = vec4(1, 1, 1, 1);
+	vec3 flameColor = texture(flameColorTex, flameTime).rgb;
+	fragColor.rgb = flameColor;
+
+	fragColor.a = flameAlpha;
+	//fragColor = vec4(1, 1, 1, 1);
 }
 

@@ -229,6 +229,8 @@ int main()
 
 		auto startTime = std::chrono::steady_clock::now();
 
+		//glDisable(GL_CULL_FACE);
+
 		while (!shouldQuit) {
 			Uint64 frameStartTime = SDL_GetTicks64();
 			float animTimeSeconds = 1e-6f * (float)std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now() - startTime).count();

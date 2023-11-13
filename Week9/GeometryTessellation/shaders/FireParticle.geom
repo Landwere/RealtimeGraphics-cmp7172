@@ -34,5 +34,29 @@ void main()
 	// Don't forget to pass through the other important info, like flameTime, texCoords,
 	// texXOffset.
 
+	flameTime = VertexIn[0].flameTime;
+
+
+	texCoords = vec2(0,0);
+	vec3 pointToCam = normalize( gl_in[0].gl_Position - cameraPos).xyz;
+	vec3 camCross = normalize(cross(vec3(0,1,0), pointToCam));
+	vec3 camUp = cross(camCross, pointToCam);
+	gl_Position = worldToClip * vec4( flameParticleSize * (camCross + camUp) + gl_in[0].gl_Position.xyz, 1  );
+	EmitVertex();
+	texCoords = vec2(1,0);
+	gl_Position = worldToClip * vec4( flameParticleSize * (-camCross + camUp) + gl_in[0].gl_Position.xyz, 1  );
+
+	EmitVertex();
+	texCoords = vec2(0,1);
+	gl_Position = worldToClip * vec4( flameParticleSize * (camCross + -camUp) + gl_in[0].gl_Position.xyz, 1  );
+	EmitVertex();
+	texCoords = vec2(1,1);
+	gl_Position = worldToClip * vec4( flameParticleSize * (-camCross + -camUp) + gl_in[0].gl_Position.xyz, 1  );
+
+	EmitVertex();
+
+
+	EndPrimitive();
+
 }
 

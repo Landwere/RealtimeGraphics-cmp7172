@@ -258,13 +258,12 @@ int main()
 			// Use the compute shader (again, normally glUseProgram, but the class has use() 
 			// and unuse() methods).
 			// Dispatch with glDispatchCompute (set dimensions appropriately).
-			glhelper::BufferObject particleBuffer(nParticles, GL_SHADER_STORAGE_BUFFER);
+			//glhelper::BufferObject particleBuffer(nParticles, GL_SHADER_STORAGE_BUFFER);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, particleBuffer.get());
 
-			glhelper::BufferObject velocityBuffer(nParticles, GL_SHADER_STORAGE_BUFFER);
+			//glhelper::BufferObject velocityBuffer(nParticles, GL_SHADER_STORAGE_BUFFER);
 			glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velocityBuffer.get());
-			glUseProgram(particleBuffer.get());
-			glUseProgram(velocityBuffer.get());
+			glUseProgram(particlePhysicsShader.get());
 			glDispatchCompute(nParticles, 1, 1);
 			// Your code here
 			// Handle synchronisation. Add a glMemoryBarrier somewhere below here.
@@ -289,7 +288,9 @@ int main()
 			glEnable(GL_BLEND);
 			glDepthMask(GL_FALSE);
 			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 			glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+
 			glBindVertexArray(ringVao);
 			billboardParticleShader.use();
 			glDrawArrays(GL_POINTS, 0, nParticles);

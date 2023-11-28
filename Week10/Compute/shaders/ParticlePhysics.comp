@@ -42,6 +42,6 @@ void main() {
     velocity += (acceleration * timeStep);
 
     vel[gl_GlobalInvocationID.x].xyz = velocity;
-    pos[gl_GlobalInvocationID.x].xyz += velocity;
+    pos[gl_GlobalInvocationID.x].xyz += velocity * timeStep;
 }
 

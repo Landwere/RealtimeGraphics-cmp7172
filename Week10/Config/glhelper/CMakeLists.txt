@@ -23,6 +23,7 @@ add_library(glhelper
 	ShaderProgram.hpp
 	Texture.hpp
 	Viewer.hpp
+	json.hpp
 )
 
 target_compile_features(glhelper PRIVATE cxx_std_17)

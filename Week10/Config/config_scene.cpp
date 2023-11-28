@@ -21,7 +21,7 @@
 #define GLT_IMPLEMENTATION
 #include <gltext.h>
 
-#include "json/json.hpp"
+#include "glhelper/json.hpp"
 
 const int winWidth = 1280, winHeight = 720;
 

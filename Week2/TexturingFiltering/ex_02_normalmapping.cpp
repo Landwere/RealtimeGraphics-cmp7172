@@ -55,7 +55,7 @@ void loadSpotMesh(glhelper::Mesh* mesh)
 	// the same way as the Mesh::norm() method.
 
 	Assimp::Importer importer;
-	importer.ReadFile("../models/spot/spot_triangulated.obj", aiProcess_Triangulate | aiProcess_GenSmoothNormals);
+	importer.ReadFile("../models/spot/spot_triangulated.obj", aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace);
 	const aiScene* aiscene = importer.GetScene();
 	const aiMesh* aimesh = aiscene->mMeshes[0];
 
@@ -67,6 +67,9 @@ void loadSpotMesh(glhelper::Mesh* mesh)
 
 
 	std::vector<GLuint> elems(aimesh->mNumFaces*3);
+
+	memcpy(biTangents.data(), aimesh->mBitangents, aimesh->mNumVertices * sizeof(aiVector3D));
+	memcpy(tangents.data(), aimesh->mTangents, aimesh->mNumVertices * sizeof(aiVector3D));
 	memcpy(verts.data(), aimesh->mVertices, aimesh->mNumVertices * sizeof(aiVector3D));
 	memcpy(norms.data(), aimesh->mNormals, aimesh->mNumVertices * sizeof(aiVector3D));
 	for (size_t v = 0; v < aimesh->mNumVertices; ++v) {
@@ -84,7 +87,7 @@ void loadSpotMesh(glhelper::Mesh* mesh)
 
 	mesh->vert(verts);
 	mesh->norm(norms);
-	mesh->elems(elems);
+	//mesh->elems(elems);
 	mesh->tex(uvs);
 }
 

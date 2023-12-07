@@ -3,6 +3,8 @@
 layout(location = 0) in vec3 vPos;
 layout(location = 1) in vec3 vNorm;
 layout(location = 2) in vec2 vTex;
+layout(location = 4) in vec3 vTan;
+layout(location = 5) in vec3 vBiTan;
 // --- Your code here ---
 // Add vertex input for the tangent and bitangent here.
 // The mesh class sets the tangent to location 4 and the
@@ -21,12 +23,15 @@ out vec2 texCoord;
 out vec3 fragPosWorld;
 out mat3 TBN;
 out vec3 normWorld;
-
+out vec3 biTan;
+out vec3 _tan;
 void main()
 {
 	texCoord = vTex;
 	gl_Position = worldToClip *  modelToWorld * vec4(vPos, 1.0f);
 	fragPosWorld = (modelToWorld * vec4(vPos, 1.0f)).xyz;
 	normWorld = normToWorld * vNorm;
+	biTan = normToWorld * vBiTan;
+	_tan = normToWorld * vTan;
 }
 

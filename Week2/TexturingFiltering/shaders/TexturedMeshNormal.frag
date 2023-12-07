@@ -3,6 +3,8 @@
 in vec2 texCoord;
 in vec3 normWorld;
 in vec3 fragPosWorld;
+in vec3 biTan;
+in vec3 _tan;
 
 uniform sampler2D albedoTex;
 uniform sampler2D normalTex;
@@ -33,9 +35,10 @@ void main()
 	// Remember to rescale the normal from [0,1] to [-1,1]
 
 	//vec4 normalColor = vec4((normal.xyz * 2) - 1);
-	vec3 normWorld = vec3((normal.xyz * 2 ) -1);
+	vec3 normScaled = vec3((normal.xyz * 2 ) -1);
+	vec3 mapNormal = (normScaled.x * _tan, normScaled.y * biTan, normScaled.z * normWorld);
 	vec4 diffuseColor = vec4(albedo.xyz * dot(normWorld, lightDir), 1.0f);
-	float specularPower = pow(clamp(dot(reflect(lightDir, normWorld), -viewDir), 0, 1), specularity);
+	float specularPower = pow(clamp(dot(reflect(lightDir, mapNormal), -viewDir), 0, 1), specularity);
 	vec4 specularColor = vec4(specularPower * vec3(1,1,1), 1.0);
 
 	color = lightIntensity * (diffuseColor + specularColor) / (lightDistance*lightDistance);

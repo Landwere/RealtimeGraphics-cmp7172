@@ -122,10 +122,11 @@ int main()
 			// Make a box collision shape, set its transform, mass, inertia and restitution
 			// then make the rigidbody with these properties and add it to the world.
 			btBoxShape* box;
-			box = new btBoxShape(btVector3(5, 1, 5));
+			box = new btBoxShape(btVector3(5, 3, 5));
 			btRigidBody* floor;
 			btRigidBody::btRigidBodyConstructionInfo floorInfo{ 0, 0, box};
 			floor = new btRigidBody(floorInfo);
+			floor->setRestitution(1);
 			floor->setCollisionShape(box);
 			floor->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, groundYPos, 0.0f)));
 			world->addCollisionObject(floor);
@@ -146,9 +147,10 @@ int main()
 			ballTr.setOrigin(btVector3(0.0f, 5.f, 0));
 			//sphere->calculateLocalInertia(1, btVector3(0, 0, 0));
 			btDefaultMotionState* ballMS = new btDefaultMotionState(ballTr);
-
-			btRigidBody::btRigidBodyConstructionInfo ballInfo{ 1, ballMS, sphere };
+		
+			btRigidBody::btRigidBodyConstructionInfo ballInfo{ 1, ballMS, sphere};
 			ball = new btRigidBody(ballInfo);
+			ball->setRestitution(1);
 			ball->setCollisionShape(sphere);
 			ball->setWorldTransform(btTransform(btQuaternion(0, 0, 0), btVector3(0.0f, 5.0f, 0.0f)));
 			ball->setActivationState(DISABLE_DEACTIVATION);
@@ -222,7 +224,8 @@ int main()
 					// the force to accelerate the ball.
 					// If you didn't set DISABLE_DEACTIVATION you'll want to call body->activate() before
 					// applying forces & impulses.
-
+					ball->applyForce(btVector3(0.0f, 5.0f, 0.0f), btVector3(ballPos.x(), ballPos.y(), ballPos.z()));
+					
 				}
 
 			}
